@@ -1,0 +1,18 @@
+Planeamiento para el Jueves 16/10/2014:
+
+1) Completar la SRS con los nuevos casos de Uso:
+    * Nuevos cantos de Truco ✓
+    * Nuevos cantos de Envido ✓
+    * Mentir en el Envido ✓
+    * Pedir mostrar cartas si se juega el envido ✓
+    * Irse al mazo ✓
+
+2) Cambiar el diagrama de Clases para soportar los cambios planteados en la SRS ✓
+
+3) Terminar de la vieja iteración en el código: (Falta)
+    * Si se canta truco en la primera mano y no se canto envido - Poder Cantar Envido y dejar el
+      Truco pendiente ✓
+        Observacion: El que canta envido, si le cantaron truco,
+                    queda marcado como que es su turno, aunque no pueda hacer nada. ✓ (Solucionado)
+
+Estado: COMPLETO

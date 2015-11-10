@@ -1,0 +1,521 @@
+* Se utilizó la página www.websequencediagrams.com para realizar los diagramas de secuencia *
+
+--------------------------------------------------------------------------------
+
+title Pedir página login
+
+Browser->Views: HttpRequest (GET '/truco')
+Views->templates.login: render_to_response()
+templates.login->Views: html
+Views->Browser: HttpResponse ('/truco')
+
+--------------------------------------------------------------------------------
+
+title Pedir página de registro
+
+Browser->Views: HttpRequest (GET '/truco/register')
+Views->django.contrib.auth: UserCreationForm()
+django.contrib.auth->Views: form
+Views->Browser: HttpResponse ('/truco/register')
+
+--------------------------------------------------------------------------------
+
+title Login satisfactorio
+
+Browser->Views: HttpRequest (POST '/truco')
+Views->django.contrib.auth.User: is_auth()?
+django.contrib.auth->Views: True
+Views->Browser: HttpResponseRedirect ('/truco/lobby')
+
+--------------------------------------------------------------------------------
+
+title Login incorrecto
+
+Browser->Views: HttpRequest (POST '/truco')
+Views->django.contrib.auth.User: is_auth()?
+django.contrib.auth->Views: False
+Views->Browser: HttpResponse ('/truco')
+
+--------------------------------------------------------------------------------
+
+title Registro satisfactorio de un Usuario
+
+Browser->Views: HttpRequest (POST '/truco/register')
+Views->django.contrib.auth: UserCreationForm()
+django.contrib.auth->Views: form
+Views->UserCreationForm: is_valid()?
+UserCreationForm->Views: True
+Views->UserCreationForm: save()
+Views->Browser: HttpResponseRedirect ('/truco/register_success')
+
+--------------------------------------------------------------------------------
+
+title Registro incorrecto de un Usuario
+
+Browser->Views: HttpRequest (POST '/truco/register')
+Views->django.contrib.auth: UserCreationForm()
+django.contrib.auth->Views: form
+Views->UserCreationForm: is_valid()?
+UserCreationForm->Views: False
+Views->Browser: HttpResponse ('/truco/register')
+
+--------------------------------------------------------------------------------
+
+title Desloguearse
+
+Browser->Views: HttpRequest (GET '/truco/logout')
+Views->django.contrib.auth: logout(request_user)
+Views->Browser: HttpResponseRedirect ('/truco')
+
+--------------------------------------------------------------------------------
+
+title Invitar a partida
+
+Browser->Views: HttpRequest (GET '/truco/puntaje_inv')
+Views->templates.inv: render_to_response()
+templates.inv->Views: html
+Views->Browser: HttpResponseRedirect ('/truco/puntaje_inv')
+Browser->Views: (POST '/truco/puntaje_inv')
+Views->Perfil: perfil_invita_a()
+Views->Browser: HttpResponseRedirect('/truco/lobby')
+
+--------------------------------------------------------------------------------
+
+title Aceptar invitacion
+
+Browser->Views: HttpRequest(GET '/truco/aceptar_invitacion')
+Views->Perfil: acepta_invitacion_de()
+Perfil->Invitacion: invitado_acepta()
+Views->Browser: HttpResponse('/truco/lobby/')
+
+--------------------------------------------------------------------------------
+
+title Aceptar invitacion completa
+
+Browser->Views: HttpRequest(GET '/truco/aceptar_invitacion')
+Views->Perfil: acepta_invitacion_de()
+Perfil->Invitacion: invitado_acepta()
+Perfil->Partida: crear_partida()
+Views->Browser: HttpResponse('/truco/lobby/')
+
+--------------------------------------------------------------------------------
+
+title Rechazar invitacion
+
+Browser->Views: HttpRequest(GET '/truco/rechazar_invitacion')
+Views->Perfil: rechaza_invitacion_de()
+Perfil->Invitacion: invitado_rechaza()
+Views->Browser: HttpResponse('/truco/lobby/')
+
+--------------------------------------------------------------------------------
+
+title Iniciar partida
+
+Browser->Views: HttpRequest(GET '/truco/partida')
+Views->templates.part: render_to_response()
+templates.part->Views: html
+Views->Browser: HttpResponse ('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Finalizar partida cuando no todos salieron
+
+Browser->Views: HttpRequest(GET '/truco/finalizar_partida')
+Views->Browser: HttpResponseRedirect ('/truco/lobby')
+
+--------------------------------------------------------------------------------
+
+title Finalizar partida cuando todos salieron
+
+Browser->Views: HttpRequest(GET '/truco/finalizar_partida')
+Views->Partida: delete()
+Views->Browser: HttpResponseRedirect ('/truco/lobby')
+
+--------------------------------------------------------------------------------
+
+title Iniciar Ronda
+
+Partida->Ronda: iniciar()
+Ronda->Etapa: iniciar(0)
+Ronda->Mazo: obtener_cartas()
+Mazo->Ronda: cartas
+Ronda->Mano: iniciar()
+Ronda->Tirada: iniciar()
+Ronda->Perfil: asignar_mano()
+Ronda->Perfil: asignar_tirada()
+
+--------------------------------------------------------------------------------
+
+title Finalizar Ronda - Sin pedir mostrar cartas - No todos continuan
+
+Browser->Views: HttpRequest(GET '/truco/continuar')
+Views->Perfil: continuar()
+Perfil->Partida: finalizo_ronda()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Finalizar Ronda - Sin pedir mostrar cartas - Todos continuan - No se termina la partida
+
+Browser->Views: HttpRequest(GET '/truco/continuar')
+Views->Perfil: continuar()
+Perfil->Partida: finalizo_ronda()
+Partida->Ronda: terminar_ronda()
+Partida->Ronda: delete()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Finalizar Ronda - Sin pedir mostrar cartas - Todos continuan - Se termina la partida
+
+Browser->Views: HttpRequest(GET '/truco/continuar')
+Views->Perfil: continuar()
+Perfil->Partida: finalizo_ronda()
+Partida->Ronda: terminar_ronda()
+Perfil->Partida: terminar()
+Views->Browser: HttpResponseRedirect('/truco/lobby')
+
+--------------------------------------------------------------------------------
+
+title Finalizar Ronda - Se pide mostrar cartas
+
+Browser->Views: HttpRequest(GET '/truco/mostrar')
+Views->Perfil: mostrar_cartas()
+Views->Browser: HttpRespondeRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Tirar una carta - No se termina la etapa
+
+Browser->Views: HttpRequest(GET '/truco/tirar_carta')
+Views->Perfil: tirar_carta(c)
+Perfil->Mano: remove_carta(c)
+Perfil->Tirada: add_carta(c)
+Perfil->Etapa: aumentar_tirada()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Tirar una carta - Se termina la etapa - No se termina la ronda
+
+Browser->Views: HttpRequest(GET '/truco/tirar_carta')
+Views->Perfil: tirar_carta(c)
+Perfil->Mano: remove_carta(c)
+Perfil->Tirada: add_carta(c)
+Perfil->etapa: aumentar_tirada()
+Perfil->Ronda: chequear_ronda()
+Ronda->Etapa: crear_etapa()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Tirar una carta - Se termina la etapa - Se termina la ronda
+
+Browser->Views: HttpRequest(GET '/truco/tirar_carta')
+Views->Perfil: tirar_carta(c)
+Perfil->Mano: remove_carta(c)
+Perfil->Tirada: add_carta(c)
+Perfil->Etapa: aumentar_tirada()
+Perfil->Ronda: chequear_ronda()
+Ronda->Partida: set_continuar(True)
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Envido - Sin envido cantado anteriormente
+
+Browser->Views: HttpRequest(GET '/truco/cantar_envido')
+Views->Perfil: cantar_envido()
+Perfil->Equipo: cantar_envido()
+Equipo->EquipoContrincante: me_cantaron_envido(True)
+Equipo->Envido: iniciar()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Envido - Segundo envido cantado
+
+Browser->Views: HttpRequest(GET '/truco/cantar_envido')
+Views->Perfil: cantar_envido()
+Perfil->Equipo: cantar_envido()
+Equipo->EquipoContrincante: me_cantaron_envido(True)
+Equipo->Envido: cantar_envido()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Real Envido - Sin envido cantado anteriormente
+
+Browser->Views: HttpRequest(GET '/truco/cantar_real_envido')
+Views->Perfil: cantar_real_envido()
+Perfil->Equipo: cantar_real_envido()
+Equipo->EquipoContrincante: me_cantaron_envido(True)
+Equipo->Envido: iniciar(nivel=RE)
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Real Envido - Con envido cantado anteriormente
+
+Browser->Views: HttpRequest(GET '/truco/cantar_real_envido')
+Views->Perfil: cantar_real_envido()
+Perfil->Equipo: cantar_real_envido()
+Equipo->EquipoContrincante: me_cantaron_envido(True)
+Equipo->Envido: cantar_real_envido()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Falta Envido - Sin envido ni real cantado anteriormente
+
+Browser->Views: HttpRequest(GET '/truco/cantar_falta_envido')
+Views->Perfil: cantar_falta_envido()
+Perfil->Equipo: cantar_falta_envido()
+Equipo->EquipoContrincante: me_cantaron_envido(True)
+Equipo->Envido: iniciar(nivel=FE)
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Falta Envido - Envido o real cantado anteriormente
+
+Browser->Views: HttpRequest(GET '/truco/cantar_real_envido')
+Views->Perfil: cantar_falta_envido()
+Perfil->Equipo: cantar_falta_envido()
+Equipo->EquipoContrincante: me_cantaron_envido(True)
+Equipo->Envido: cantar_falta_envido()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Responder envido - Resp: Quiero
+
+Browser->Views: HttpRequest(GET '/truco/responder_envido')
+Views->Perfil: responder_envido(resp)
+Perfil->Equipo: responder_envido(resp)
+Equipo->Envido: set_respuesta(resp)
+Equipo->EquipoMano: cantar_puntos()
+EquipoMano->PerfilMano: puede_cantar()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Responder envido - Resp: No Quiero - No esta el truco cantado
+
+Browser->Views: HttpRequest(GET '/truco/responder_envido')
+Views->Perfil: responder_envido(resp)
+Perfil->Equipo: responder_envido(resp)
+Equipo->Envido: set_respuesta(resp)
+Equipo->Partida: set_envido_terminado()
+Equipo->PerfilIniciante: devolver_turno()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Responder envido - Resp: No Quiero -  Esta el truco cantado
+
+Browser->Views: HttpRequest(GET '/truco/responder_envido')
+Views->Perfil: responder_envido(resp)
+Perfil->Equipo: responder_envido(resp)
+Equipo->Envido: set_respuesta(resp)
+Equipo->Partida: set_envido_terminado()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Truco
+
+Browser->Views: HttpRequest(GET '/truco/cantar_truco')
+Views->Perfil: cantar_truco()
+Perfil->Equipo: cantar_truco()
+Equipo->EquipoContrincante: me_cantaron_truco(True)
+Equipo->Truco: iniciar()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Retruco
+
+Browser->Views: HttpRequest(GET '/truco/cantar_retruco')
+Views->Perfil: cantar_retruco()
+Perfil->Equipo: cantar_retruco()
+Equipo->EquipoContrincante: me_cantaron_truco(True)
+Equipo->Truco: cantar_retruco()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar Vale 4
+
+Browser->Views: HttpRequest(GET '/truco/cantar_vale_4')
+Views->Perfil: cantar_vale_4()
+Perfil->Equipo: cantar_vale_4()
+Equipo->EquipoContrincante: me_cantaron_truco(True)
+Equipo->Truco: cantar_vale_4()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Responder truco - Resp: No Quiero
+
+Browser->Views: HttpRequest(GET '/truco/responder_truco')
+Views->Perfil: responder_truco(resp)
+Perfil->Equipo: responder_truco(resp)
+Equipo->Truco: set_respuesta(resp)
+Equipo->Ronda: mandar_al_mazo(equipo)
+Ronda->Partida: set_continuar(True)
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Responder truco - Resp: Quiero
+
+Browser->Views: HttpRequest(GET '/truco/responder_truco')
+Views->Perfil: responder_truco(resp)
+Perfil->Equipo: responder_truco(resp)
+Equipo->Truco: set_respuesta(resp)
+Equipo->PerfilIniciante: devolver_turno()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Irse al mazo
+
+Browser->Views: HttpRequest(GET '/truco/irse_al_mazo')
+Views->Perfil: irse_al_mazo()
+Perfil->Equipo: irse_al_mazo()
+Equipo->Ronda: mandar_al_mazo()
+Ronda->Partida: set_continuar(True)
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar puntos - Primero en cantar
+
+Browser->Views: HttpRequest(GET '/truco/cantar_puntos')
+Views->Perfil: cantar_puntos_envido(pts)
+Perfil->Partida: set_mayor_canto()
+Perfil->EquipoContrincante: cantar_puntos()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar puntos - No ser el primero en cantar - Le gana al mayor puntaje del equipo contrincante -
+                      Quedan rivales por cantar
+
+Browser->Views: HttpRequest(GET '/truco/cantar_puntos')
+Views->Perfil: cantar_puntos_envido(pts)
+Perfil->Partida: set_mayor_canto()
+Perfil->EquipoContrincante: cantar_puntos()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar puntos - No ser el primero en cantar - Le gana al mayor puntaje del equipo contrincante -
+                      No Quedan rivales por cantar - No esta el truco cantado
+
+Browser->Views: HttpRequest(GET '/truco/cantar_puntos')
+Views->Perfil: cantar_puntos_envido(pts)
+Perfil->Partida: set_mayor_canto()
+Perfil->EquipoContrincante: cantar_puntos()
+EquipoContrincante->PerfilIniciante: devolver_turno()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+
+--------------------------------------------------------------------------------
+
+title Cantar puntos - No ser el primero en cantar - Le gana al mayor puntaje del equipo contrincante -
+                      No Quedan rivales por cantar - Esta el truco cantado
+
+Browser->Views: HttpRequest(GET '/truco/cantar_puntos')
+Views->Perfil: cantar_puntos_envido(pts)
+Perfil->Partida: set_mayor_canto()
+Perfil->EquipoContrincante: cantar_puntos()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar puntos - No ser el primero en cantar - No le gana al mayor puntaje del equipo contrincante -
+                      Quedan compañeros por cantar
+
+Browser->Views: HttpRequest(GET '/truco/cantar_puntos')
+Views->Perfil: cantar_puntos_envido(pts)
+Perfil->MiEquipo: cantar_puntos()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar puntos - No ser el primero en cantar - No le gana al mayor puntaje del equipo contrincante -
+                      No quedan compañeros por cantar - No está el truco cantado
+
+Browser->Views: HttpRequest(GET '/truco/cantar_puntos')
+Views->Perfil: cantar_puntos_envido(pts)
+Perfil->MiEquipo: cantar_puntos()
+MiEquipo->PerfilIniciante: devolver_turno()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar puntos - No ser el primero en cantar - No le gana al mayor puntaje del equipo contrincante -
+                      No quedan compañeros por cantar - Está el truco cantado
+
+Browser->Views: HttpRequest(GET '/truco/cantar_puntos')
+Views->Perfil: cantar_puntos_envido(pts)
+Perfil->MiEquipo: cantar_puntos()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar son buenas - Quedan compañeros por cantar
+
+Browser->Views: HttpRequest(GET '/truco/son_buenas')
+Views->Perfil: cantar_puntos_envido(SON BUENAS)
+Perfil->MiEquipo: cantar_puntos()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Cantar son buenas - No quedan compañeros por cantar
+
+Browser->Views: HttpRequest(GET '/truco/cantar_puntos')
+Views->Perfil: cantar_puntos_envido(SON BUENAS)
+Perfil->MiEquipo: cantar_puntos()
+MiEquipo->PerfilIniciante: devolver_turno()
+Views->Browser: HttpResponseRedirect('/truco/partida')
+
+--------------------------------------------------------------------------------
+
+title Repartir puntos envido - No se pide mostrar
+
+Partida->EquipoGanadorEnCantos: pedi_mostrar()
+EquipoGanadorEnCantos->Partida: False
+Partida->EquipoGanadorEnCantos: sumar_puntos()
+
+--------------------------------------------------------------------------------
+
+title Repartir puntos envido - Se pide mostrar - No se miente
+
+Partida->EquipoGanadorEnCantos: pedi_mostrar()
+EquipoGanadorEnCantos->Partida: True
+Partida->EquipoGanadorEnCantos: get_puntos_cantados(), get_puntaje_envido()
+Partida->EquipoGanadorEnCantos: sumar_puntos()
+
+--------------------------------------------------------------------------------
+
+title Repartir puntos envido - Se pide mostrar - Se miente
+
+Partida->EquipoGanadorEnCantos: pedi_mostrar()
+EquipoGanadorEnCantos->Partida: True
+Partida->EquipoGanadorEnCantos: get_puntos_cantados(), get_puntaje_envido()
+Partida->EquipoContrincanteGanadorEnCantos: sumar_puntos()
+
+--------------------------------------------------------------------------------
+
+title Repartir puntos truco
+
+Partida->Truco: get_puntaje()
+Truco->Partida: puntos_acumulados
+Partida->EquipoGanadorEtapas: sumar_puntos()
+
+--------------------------------------------------------------------------------
+

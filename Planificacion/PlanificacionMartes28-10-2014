@@ -1,0 +1,13 @@
+Planeamiento para el Martes 28/10/2014:
+
+1) Realizar los diagramas de secuencia faltantes
+2) Código para la segunda iteración
+    * Nuevos cantos de truco ✓
+    * Nuevos cantos de envido ✓
+    * Saber cuales son las cartas de los puntos del envido de una mano ✓
+    * Posibilidad de mentir al momento de cantar ✓
+    * Pedir mostrar cartas al finalizar la ronda si se perdio el envido ✓
+    * Todo lo relacionado a mensajes de perfil (Util para los templates) ✓
+        Observacion: Faltan Quiero y No Quiero de los cantos. ✓
+
+Estado: COMPLETO.

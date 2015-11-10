@@ -1,0 +1,16 @@
+Planeamiento para el Sabado 22/11/2014:
+
+1) Completar la SRS con los cambios para la nueva iteración ✓
+    * Principalemente casos de usos nuevos, y modificar existentes que consideren
+      que ya no es un perfil contra otro el que juega, sino conjuntos de perfiles
+      (Equipos) ✓
+    * Tener en cuenta la noción de jugador "pie" de un equipo. ✓
+2) Modificar el diagrama de clases para que soporte toda la idea de equipos. ✓
+3) Agregar los diagrama de secuencias nuevos y faltantes. ✓
+4) Código. ✓
+    Obs: Hay qe implementar que la partida no se cierre automaticamente al llegar al puntaje
+         maximo, sino que se muestre algo que indique a los ganadores y perdedores de su 
+         resultado y se tenga un atributo para guardar que se gano/perdio.
+5) Tests! ~
+
+Estado: EN PROGRESO.
